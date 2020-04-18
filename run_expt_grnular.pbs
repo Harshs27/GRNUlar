@@ -1,7 +1,7 @@
 # script to run on GPUs
 #PBS -N res_expt_grnular
-#PBS -q swarm-gpu
-#PBS -l nodes=1:ppn=7:gpus=1:exclusive_process
+#PBS -q hive-gpu-short
+#PBS -l nodes=1:ppn=1:gpus=1:exclusive_process
 #PBS -l walltime=12:00:00
 #PBS -v D pts C NP Decays E Pe Gl dataT NT Ktr Kva Kte MS SS Sp L pcrln pcrlx pcrhn pcrhx kmin kmax tf rMR TFp H initT techN dropS dropP dataM dataN Hd lrDNN DNNe lrG P B
 

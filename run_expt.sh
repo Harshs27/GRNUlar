@@ -89,7 +89,7 @@ do
 #                            echo "Running GLAD on swarm-gpu"
 #                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, B=${B}, lrG=${lrG}" run_sim_expt3_glad.pbs &
 
-                            echo "Running GRNUlar on swarm-gpu"
+                            echo "Running GRNUlar on gpu"
                             qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, Hd=${Hd}, lrDNN=${lrDNN}, DNNe=${DNNe}, lrG=${lrG}, P=${P}, B=${B}" run_expt_grnular.pbs &
 
 #                            echo "Running GRNUlar on hive-gpu"
