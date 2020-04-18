@@ -1,0 +1,20 @@
+# script to run on GPUs
+#PBS -N res_expt_grnular
+#PBS -q swarm-gpu
+#PBS -l nodes=1:ppn=7:gpus=1:exclusive_process
+#PBS -l walltime=12:00:00
+#PBS -v D pts C NP Decays E Pe Gl dataT NT Ktr Kva Kte MS SS Sp L pcrln pcrlx pcrhn pcrhx kmin kmax tf rMR TFp H initT techN dropS dropP dataM dataN Hd lrDNN DNNe lrG P B
+
+
+
+echo "Running grnular experiments"
+
+cd data/alienn/GRNUlar/
+echo $PBS_O_WORKDIR
+
+module load anaconda3   
+source activate pt
+
+python -u -m grnular.source.main_grnular --D $D --POINTS_PER_CLASS ${pts} --C $C --NOISE_PARAMS ${NP} --DECAYS ${Decays} --EPOCHS $E --PRINT_EPOCH ${Pe} --GLAD_LOSS ${Gl} --DATA_TYPE ${dataT} --NOISE_TYPE ${NT} --K_train ${Ktr} --K_valid ${Kva} --K_test ${Kte} --MODEL_SELECT ${MS} --SAMPLING_STATE ${SS} --sparsity ${Sp} --L ${L} --pcr_low_min ${pcrln}  --pcr_low_max ${pcrlx} --pcr_high_min ${pcrhn} --pcr_high_max ${pcrhx} --Kij_min ${kmin} --Kij_max ${kmax} --USE_TF_NAMES ${tf} --ratio_MR ${rMR} --connect_TF_prob ${TFp} --H ${H} --theta_init_offset ${initT} --ADD_TECHNICAL_NOISE ${techN} --dropout_shape ${dropS} --dropout_percentile ${dropP} --DATA_METHOD ${dataM} --DATA_NAME ${dataN} --Hd ${Hd} --lrDNN ${lrDNN} --DNN_EPOCHS ${DNNe} --lr_glad ${lrG} --P ${P} --beta ${B}
+
+# NOTE: the -u flag generates output as soon as it is generated, might slow down the code?

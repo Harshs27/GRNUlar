@@ -44,7 +44,7 @@ parser.add_argument('--EPOCHS', type=int, default=150,
                     help='Number of epochs for training GLAD')
 parser.add_argument('--PRINT_EPOCH', type=int, default=20,
                     help='Print every X epochs while training GLAD')
-parser.add_argument('--MODEL_SELECT', type=str,  default='Fb', #'current', #'Fb', 
+parser.add_argument('--MODEL_SELECT', type=str,  default='aupr', #'current', #'Fb', 
                     help='select model based on best results: {graph recovery}Fb=auc=aupr/shd/current ')
 
 
@@ -251,9 +251,9 @@ def glad_train_batch(train_data, valid_data=None):
 #    if len(valid_data)>0:
 #        valid_data = format_torch(valid_data)
 
-#    rd = np.random.choice(len(train_data), size=len(train_data), replace=False) # get a rand number
+    rd = np.random.choice(len(train_data), size=len(train_data), replace=False) # get a rand number
     
-    rd = np.random.choice(len(train_data), size=5, replace=False) # get a rand number
+#    rd = np.random.choice(len(train_data), size=5, replace=False) # get a rand number
     print('selecting random points for training: ', rd, len(rd))
     #for i, d in enumerate(train_data[rd]):
     for i, ri in enumerate(rd):
