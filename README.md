@@ -1,4 +1,6 @@
 # GRNUlar
 Gene Regulatory Network reconstruction using Unrolled algorithms  
 
-I will update this repository latest by April 1st 2020. Thanks for your patience. Kindly leave a dm if you want to access the code, I can share the beta version of my implementation 
+Please explore the notebook folder for a quick overview of the GRNUlar algorithm on jupyter notebook implementation.  
+
+The `grnular' folder is a python module of the algorithm's implementation.  
