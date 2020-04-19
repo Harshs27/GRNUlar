@@ -14,7 +14,7 @@ from grnular.source.grnular_model import dnn_model
 from grnular.utils.metrics import report_metrics
 import sys, copy, pickle, time
 import sklearn
-print('The scikit-learn version is {}.'.format(sklearn.__version__))
+
 #np.set_printoptions(threshold=sys.maxsize)
 TRAIN=True
 
@@ -57,7 +57,7 @@ parser.add_argument('--lambda_init', type=float, default=1, #1,
                     help='initial value of lambda ')
 parser.add_argument('--theta_init_offset', type=float, default=1, #0.01, #0.03, #075,
                     help='offset for setting the diagonal init theta approximation')
-parser.add_argument('--L', type=int, default= 10,
+parser.add_argument('--L', type=int, default=15,
                     help='Unroll the network L times')
 parser.add_argument('--INIT_DIAG', type=int, default=0,
                     help='1 : initialize the theta0 diagonally')
@@ -67,18 +67,18 @@ parser.add_argument('--beta', type=float,  default=1.0,# 1.0
                     help='differentiable F-beta loss')
 parser.add_argument('--use_optimizer', type=str,  default='adam',
                     help='can use either: adam, adadelta, rms, sgd')
-parser.add_argument('--lr_glad', type=float, default=0.01, #0.01,
+parser.add_argument('--lr_glad', type=float, default=0.03, #0.01,
                     help='learning rate for the GLAD model')
 parser.add_argument('--USE_TF_NAMES', type=str,  default='yes',# 'yes' 
                     help='use transcription factors to improve prediction: will use in general')
 # ****************************DNN 
-parser.add_argument('--Hd', type=int, default=20,
+parser.add_argument('--Hd', type=int, default=40,
                     help='Hidden layer size of DNN')
-parser.add_argument('--DNN_EPOCHS', type=int, default=40,
+parser.add_argument('--DNN_EPOCHS', type=int, default=200,
                     help='Num of epoch for optimizing DNN')
-parser.add_argument('--lrDNN', type=float, default=0.01,
+parser.add_argument('--lrDNN', type=float, default=0.03,
                     help='learning rate for the DNN model')
-parser.add_argument('--P', type=int, default= 5,
+parser.add_argument('--P', type=int, default=10,
                     help='Unroll the DNN network P times')
 
 
@@ -213,11 +213,11 @@ def get_glad_criterion():
 def format_torch(data):# convert the data to pytorch
     data_torch = []
     typeS = 'mean'
-    print('Using ', typeS, ' scaling')
+    #print('Using ', typeS, ' scaling')
     for i, d in enumerate(data):
         X, y, theta, TF = d
-        if i==0:
-            print('TF',  TF)
+#        if i==0:
+#            print('TF',  TF)
         X = normalizing_data(X, typeS)
         theta = theta.real
         X = convert_to_torch(X, TESTING_FLAG=True)    
@@ -246,49 +246,27 @@ def glad_train_batch(train_data, valid_data=None):
     scheduler = MultiStepLR(optimizer_glad, milestones=milestones, gamma=0.75)
     best_valid_shd, best_valid_Fb = np.inf, -1*np.inf
 
-    # shift the complete train_data & valid data to GPU
-#    train_data = format_torch(train_data)
-#    if len(valid_data)>0:
-#        valid_data = format_torch(valid_data)
-
     rd = np.random.choice(len(train_data), size=len(train_data), replace=False) # get a rand number
     
 #    rd = np.random.choice(len(train_data), size=5, replace=False) # get a rand number
-    print('selecting random points for training: ', rd, len(rd))
+#    print('selecting random points for training: ', rd, len(rd))
     #for i, d in enumerate(train_data[rd]):
+    do_PRINT = True # print every epoch for the 1st batch
     for i, ri in enumerate(rd):
         X, y, theta_true, TF = train_data[ri]
-        #X, y, theta_true, TF = d
-#        print('che', i, d)
-#        br
-        do_PRINT = True # print every epoch for the 1st batch
+
+        
 
         for epoch in range(args.EPOCHS):# in each epoch, go through the complete batch
-#        for i, d in enumerate(train_data):
-            #X, y, theta, TF = d
-#            theta = theta.real
-#            X = convert_to_torch(X, TESTING_FLAG=True)    
-#            theta_true = convert_to_torch(theta, TESTING_FLAG=True)
-#            dtype = torch.FloatTensor
-#            if USE_CUDA == True:
-#                dtype = torch.cuda.FloatTensor
-#                theta_true = theta_true.type(dtype)
 
             batch_num = i
             if batch_num==0 and epoch==0: # checking dnn model
                 model_dnn_check = dnn_model(T=len(TF), O=X.shape[1], H=args.Hd, USE_CUDA=(args.USE_CUDA_FLAG==1))
                 print('DNN model check:', model_dnn_check.getDNN())
                 print('#################### total points = ', X.shape[0])
-            # a good init for every X
-            #model_dnn, optimizer_dnn = grnular.goodINIT(X, TF, args)
-            #if i==0:
-            #    print('DNN model check:', model_dnn.getDNN())
 
             t1 = time.time()
-#        for epoch in range(args.EPOCHS):# optimize the complete unrolled algo
             optimizer_glad.zero_grad()
-#            theta_s, loss_glad = glad(S, theta_true, model_glad, args, criterion_graph)
-#            theta_s, loss_glad = grnular.grnular(X, theta_true, TF, [model_glad, model_dnn, optimizer_dnn], args, criterion_graph, do_PRINT) # output = theta_s, loss_glad
             theta_s, loss_glad = grnular.grnular(X, theta_true, TF, model_glad, args, criterion_graph, do_PRINT) # output = theta_s, loss_glad
             theta_s = torch.squeeze(theta_s)
 
@@ -323,10 +301,11 @@ def glad_train_batch(train_data, valid_data=None):
                     best_valid_shd = curr_valid_shd
                 model_glad.train()
                 t4 = time.time() # running on validation data
+            if do_PRINT:
                 print('time req for grnular forward call (secs): ', t2-t1)
                 print('time req for loss backward call & update (secs): ', t3-t2)
-                print('time req for validation model update (secs): ', t4-t3)
-            do_PRINT = False # only print at the start of the batch and 0th epoch
+                #print('time req for validation model update (secs): ', t4-t3)
+                do_PRINT = False # only print at the start of the batch and 0th epoch
 
     print('CHECK RHO & theta Learned, may not correspond to the best metric model: ', model_glad.rho_l1[0].weight, model_glad.theta_init_offset)
     if args.MODEL_SELECT in ['auc', 'aupr', 'Fb']: # best graph recovery metric 
@@ -338,14 +317,8 @@ def glad_train_batch(train_data, valid_data=None):
     else:
         return 'Check model select'
 
-def get_res_filepath():
-    FILE_NUM = str(np.random.randint(10000))
-    savepath = 'simulator/BEELINE-data/my_pred_networks/'
-    filepath = savepath +'grnular_beeline_pred_tag'+str(FILE_NUM)+'.pickle'
-    return filepath
 
 def glad_predict_batch(model, data, PRINT=True, PREDICT_TF=False, BEELINE=False):
-    print('Check Hd: ', args.Hd)
     with torch.no_grad():
         # return the mean and std_dev of the data pairs
         # putting the models in eval mode
@@ -356,31 +329,8 @@ def glad_predict_batch(model, data, PRINT=True, PREDICT_TF=False, BEELINE=False)
         res = [] # add res_tf
         for i, d in enumerate(data):
             X, y, theta_true, TF = d
-            if BEELINE:
-                print('Data set : ', i, y[:2]) 
-                res.append(glad_predict_single(model, model_auxiliary, theta_true, X, TF, PRINT=True, pair_num=i, BEELINE=BEELINE))
-                
-            else:
-#            theta_true = theta_true.real
-        #        if args.USE_TF_NAMES=='yes' and PREDICT_TF:
-                res.append(glad_predict_single(model, model_auxiliary, theta_true, X, TF, PRINT=False, pair_num=i))
-        #    print('Check res: ', res)
-        if BEELINE:
-            save_res = []
-            for i, r1 in enumerate(res):# r1 = [res, [theta_pred]]
-                r = r1[0]
-                r = ["%.3f" %x for x in r]
-                print(data[i][1][:2], r)
-                data_numpy = [_npy(data[i][0]), data[i][1], _npy(data[i][2]), data[i][3]]
-                save_res.append([data_numpy, r1])
-                #save_res.append([data[i], r1])
-            print('Saving the results, [dataname, mapping, theta_pred, theta_true]')
-            FILEPATH = get_res_filepath()
-            print(FILEPATH)
-            with open(FILEPATH, 'wb') as handle:
-                pickle.dump(save_res, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
-            return
+            res.append(glad_predict_single(model, model_auxiliary, theta_true, X, TF, PRINT=False, pair_num=i))
+
         res_mean = np.mean(np.array(res).astype(np.float64), 0)
         res_std  = np.std(np.array(res).astype(np.float64), 0)
         res_mean = ["%.3f" %x for x in res_mean]
@@ -409,6 +359,7 @@ def get_PSD_matrix(A, u=1):
     #print('CHEKKK: smallest eigen? = ', np.min(np.linalg.eigvals(target_precision_mat)))
     return target_precision_mat
 
+"""
 def postprocess_tf(prec, tf_names):
 #    print('Postprocesing for TF NAMES')
     # remove all the edges whose at least one of the vertices is not in tf_names
@@ -428,7 +379,7 @@ def postprocess_tf(prec, tf_names):
             G_pred.remove_edge(*e[:2])
     prec = get_PSD_matrix(nx.adj_matrix(G_pred).todense())
     return np.array(prec)
-
+"""
 
 def get_tf_mask(tf_names, dim):
     mask = torch.zeros(dim, dim) + torch.eye(dim)
@@ -491,41 +442,17 @@ def get_graph_from_theta(theta):
 def glad_predict_single(model, model_auxiliary, theta_true, X, TF, PRINT=True, pair_num=-1, BEELINE=False):
     model_glad = model
     criterion_graph =  model_auxiliary
-    # preparing the data
-#    X = convert_to_torch(X, TESTING_FLAG=True) 
-#    theta_true = convert_to_torch(theta, TESTING_FLAG=True)
-
-#    dtype = torch.FloatTensor
-#    if USE_CUDA == True:
-#        dtype = torch.cuda.FloatTensor
-#        theta_true = theta_true.type(dtype)
-
-    # good INIT
-#    model_dnn, optimizer_dnn = grnular.goodINIT(X, TF, args, PRINT=PRINT, PREDICT=True)
-    # run unrolled model
-#    theta_s, loss_glad = grnular.grnular(X, theta_true, TF, [model_glad, model_dnn, optimizer_dnn], args, criterion_graph, PRINT=PRINT, PREDICT=True) # output = theta_s, loss_glad
     theta_s, loss_glad = grnular.grnular(X, theta_true, TF, model_glad, args, criterion_graph, PRINT=PRINT, PREDICT=True) # output = theta_s, loss_glad
     theta_s = torch.squeeze(theta_s)
-    
-    #recovery_metrics = compare_theta(theta, theta_s)
     recovery_metrics = compare_theta(_npy(theta_true), theta_s)
     itr_details = [loss_glad.detach().cpu().numpy()[0]]
     if PRINT:
         print('FDR, TPR, FPR, SHD, nnz_true, nnz_pred, precision, recall, Fb, aupr, auc')
         print('TEST: Recovery of true theta: ', *np.around(recovery_metrics, 3))
         print('TEST: glad loss', *np.around(itr_details, 3))
-    
-
-#    # POSTPROCESSING code for TF
-#    if args.USE_TF_NAMES=='yes' and len(tf_names) != 0:
-#        prec_tf = postprocess_tf(theta_s.detach().cpu().numpy(), tf_names)
-#        recovery_metrics = report_metrics(np.array(theta), prec_tf)
-
-    res = list(recovery_metrics)# + itr_details
-    if BEELINE:
-        res = [list(recovery_metrics), theta_s.detach().cpu().numpy()]
+    res = list(recovery_metrics)
     return res 
-    #return list(recovery_metrics) + itr_details # concatenate results
+
 
 
 def normalizing_data(X, typeS='log'):
@@ -607,11 +534,11 @@ def main():
         print('GLAD batch predict results: Number of data pairs Train/valid/test ', len(train_data), len(valid_data), len(test_data))
         #print('FDR, TPR, FPR, SHD, nnz_true, nnz_pred, precision, recall, Fb, aupr, auc, total loss, glad loss, conn loss, accuracy, ARI')
         print('FDR, ,TPR, ,FPR, ,SHD, ,nnz_true, ,nnz_pred, ,precision, ,recall, ,Fb, ,aupr, ,auc, ')
-#        print('Final results on Training data')
+        print('Final results on Training data')
         glad_predict_batch(model, train_data, PRINT=True)
-#        print('Final results on Valid data')
+        print('Final results on Valid data')
         glad_predict_batch(model, valid_data, PRINT=True)
-#        print('Model trained, now predicting on test data')
+        print('Model trained, now predicting on test data')
         glad_predict_batch(model, test_data, PRINT=True)
 #        print('\n With TF_NAMES: FDR, ,TPR, ,FPR, ,SHD, ,nnz_true, ,nnz_pred, ,precision, ,recall, ,Fb, ,aupr, ,auc, ')
 #        print('Final results on Training data')
