@@ -1,31 +1,17 @@
 # SERGIO (Single-cell ExpRession of Genes In silicO)
+## Note: Please refer their repository for complete details 
 SERGIO v1.0.0
 
-Saurabh Sinha’s Lab, University of Illinois at Urbana-Champaign [Sinha Lab](https://www.sinhalab.net/sinha-s-home)
+Courtesy of Saurabh Sinha’s Lab, University of Illinois at Urbana-Champaign [Sinha Lab](https://www.sinhalab.net/sinha-s-home)
 
 Developed by Payam Dibaeinia
 
 ## Description
 SERGIO is a simulator for single-cell expression data guided by gene regulatory networks. A command-line, easy-to-use version of SERGIO will be soon uploaded to PyPI. Here is the documentation for using SERGIO v1.0.0 as a module in python.
 
-## Dependencies
-Python >= 2.7.14
-
-numpy >= 1.13.3
-
-scipy >= 1.1.0
-
-networkx >= 2.0
-
-The tool has been succefully tested on MacOS Sierra (v10.12.6) and ScientificLinux 6.9.
-
-## Getting Started
-To download SERGIO, clone the repository via the following command (should take < 1 minute):
-
-```git clone https://github.com/PayamDiba/SERGIO```
 
 
-## Usage
+## Usage: 
 
 run_sergio.ipynb is a jupyter notebook that runs SERGIO for steady-state and differentiation simulations as well as adding technical noise. SERGIO with an easier interface for simulations and adding technical noise will be soon uploaded to PyPI. 
 ### Simulating Clean Data
@@ -81,82 +67,10 @@ Column order is: target gene id, number of target’s regulators, regulator ID_1
 
 * shared_coop_state: in case of using >0 values, the same value is used for all hill coefficients in simulations and therefore there is no need to specify these values (hill_coeff) in the input_file_taregets (they are ignored otherwise). In case of using any <=0 value, hill coefficients will be read from input_file_taregets. Recommended values of hill coefficient is between 1 and 3 (default: 0).
 
-3. For running steady-state simulations invoke `simulate` method:
-```python
-sim.simulate()
-```
-
-For running differentiation simulations invole `simulate_dynamics` method:
-```python
-sim.simulate_dynamics()
-```
-4. To get the clean simulated expression matrix after steady_state simulations invoke `getExpressions` method:
-```python
-expr = sim.getExpressions()
-```
-
-This returns a 3d numpy array (#cell_types * #genes * #cells_per_type). To convert into a 2d matrix of size (#genes * #cells) do:
-```python
-expr = np.concatenate(expr, axis = 1)
-```
-
-Now each row represents a gene and each column represents a simulated single-cell. Gene IDs match their row in this expression matrix, also cell types are groupd by columns such that the first #cells_per_type columns correspond to the first simulated cell type, the next #cells_per_type columns correpond to the second cell type and ... .
-
-To get the clean simulated expression matrix after differentiation simulations invoke `getExpressions_dynamics` method:
-```python
-exprU, exprS = sim.getExpressions_dynamics()
-```
-
-This returns two 3d numpy array (#cell_types * #genes * #cells_per_type) for unspliced (exprU) and spliced (exprS) transcripts. To convert them into a 2d matrix of size (#genes * #cells) do:
-```python
-exprU = np.concatenate(exprU, axis = 1)
-exprS = np.concatenate(exprS, axis = 1)
-```
-
-Now each row represents a gene and each column represents a simulated single-cell. Gene IDs match their row in this expression matrix, also cell types are groupd by columns such that the first #cells_per_type columns correspond to the first simulated cell type, the next #cells_per_type columns correpond to the second cell type and ... .
-
 
 ### Adding Technical Noise
-SERGIO can add three type of technical noise (outlier genes, library size, and dropouts) to the clean simulated data. These noise modules can be invoked in any combination and order. Also, there is a fourth module that converts an expression matrix to an mRNA count matrix. All of these modules work on the 3d expression matrix (not the 2d concatenated version).
 
-First use SERGIO to simulate a clean data set and obtain the 3d expression matrix:  
-In steady-state simulations:  
-```python
-expr = sim.getExpressions()
-```
-
-In differentiation simulations:
-```python
-exprU, exprS = sim.getExpressions_dynamics()
-```
-
-
-Here we show how to add outlier genes followed by library size and then dropouts. Please refer to the manuscript for the definitions of the input parameters to the each of the noise modules:
-1. **Outlier Genes**: 
-
-In steady-state simulations invoke the `outlier_effect` method:
-```python
-expr_O = sim.outlier_effect(expr, outlier_prob, mean, scale)
-```
-
-In differentiation simulations invoke the `outlier_effect_dynamics` method:
-```python
-exprU_O, exprS_O = sim.outlier_effect_dynamics(exprU, exprS, outlier_prob, mean, scale)
-```
-
-2. **Library Size**: 
-
-In steady-state simulations invoke the `lib_size_effect` method:
-```python
-expr_O_L = sim.lib_size_effect(expr_O, mean, scale)
-```
-
-In differentiation simulations invoke the `lib_size_effect_dynamics` method:
-```python
-exprU_O_L, exprS_O_L = sim.outlier_effect_dynamics(exprU_O, exprS_O, mean, scale)
-```
-
-3. **Dropouts**: 
+**Dropouts**: 
 
 In steady-state simulations invoke the `dropout_indicator` method:
 ```python
@@ -171,26 +85,4 @@ exprU_O_L_D = np.multiply(binary_indU, exprU_O_L)
 exprS_O_L_D = np.multiply(binary_indS, exprS_O_L)
 ```
 
-4. **mRNA Count Matrix**: 
 
-In steady-state simulations invoke the `convert_to_UMIcounts` method:
-```python
-count_matrix = sim.convert_to_UMIcounts(expr_O_L_D)
-```
-
-In differentiation simulations invoke the `convert_to_UMIcounts_dynamics` method:
-```python
-count_matrix_U = sim.convert_to_UMIcounts_dynamics(exprU_O_L_D)
-count_matrix_S = sim.convert_to_UMIcounts_dynamics(exprS_O_L_D)
-```
-
-The output of each of these modules including the "count matrix conversion" module are 3d numpy arrays of size (#cell_types * #gene * #cells_per_type). To convert them into a 2d expression matrix invoke numpy.concatenate as shown before. 
-
-## Repository Contents
-* SERGIO/ contains the python codes required for simulations.
-
-* data_sets/ cotains 11 data sets including 6 steady-state and 5 differentiation simulated data. Each data set's folder contains the input files used in simulations as well the ground truth (gt) GRN. Differentiation data sets' folders also contain the differentiation graph (bMat) used in simulations.
-
-* GNW_sampled_GRNs/ contains four networks sampled from the known regulatory network in Ecoli and Yeast using GeneNetWeaver (doi: 10.1093/bioinformatics/btr373). These networks might contain auto-regulatory edges and cycles.
-
-* Demo/ contains demo input files for both steady-state and differentiation simulations. It also contains a jupyter notebook that runs demo simulations. Expected run time on a normal desktop computer for demo steady-state simulation is about 150 seconds and for demo differentiation simulations is about 120 seconds. 
