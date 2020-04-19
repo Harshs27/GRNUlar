@@ -1,10 +1,10 @@
 #!/bin/bash
 
-E=150 #epochs
+E=20 #epochs
 Pe=1
-Ktr=20 #10 #2 #5 #5
-Kva=20 #10 #2 #5 #5
-Kte=50 #20 #2 #20 #100
+Ktr=20 #Train graphs
+Kva=20 #valid graphs
+Kte=50 #Test graphs
 dataT='clean' # load the clean data always
 dataM='sim_expt' # data method
 dataN='CUSTOM' # custom/ds1/ds2/ds3
@@ -12,16 +12,15 @@ dataN='CUSTOM' # custom/ds1/ds2/ds3
 # GLAD
 L=15 #15 # unroll of GLAD & GRNUlar
 MS='aupr' #'auc' # model select : graph recovery
-GL='mse_fb' #'mse_fb' #'F_beta' #'mse' #'mse_fb' #'no'
-#GL='F_beta' #'F_beta' #'mse' #'mse_fb' #'no'
+GL='mse_fb' #'F_beta' #'mse' #'no'
 H=3 # 'hidden layer size'
 initT=1 # 'theta_init_offset'
-lrG=0.05 #0.03 #1 #05 #0.03 #0.015 # lr of GLAD
+lrG=0.05 # lr of GLAD
 
 # GRNUlar
 Hd=20 # hidden layer of DNN
-lrDNN=0.05 #0.03 #06 #05 # learning rate of NN
-DNNe=800 #300 # number of epochs for fitting DNN
+lrDNN=0.05 #0.03 learning rate of NN
+DNNe=200 #300 # number of epochs for fitting DNN
 P=20 #Number of unrolled iterations for DNN
 
 #GLASSO
@@ -73,11 +72,11 @@ do
                 pts=$((${total_pts}/$C))  # number of points per class
                 for Decays in 1 
                 do
-                    for NP in 0.1 #0.4 #5 1 0.5 0.1 #0.2 0.3 0.4 0.5 #1 10 #0.3 #0.0 0.1 0.2 0.3 0.5 #1.0 mean_gap
+                    for NP in 0.1 # mean_gap
                     do
                         for NT in 'dpd' #'sp' 'spd' #'dpd'
                         do
-                            for Hd in 200 500 1000 #200 500
+                            for Hd in 40 #200 500 1000 #200 500
 		                    do 
                             for B in 2 #5 
                                 do

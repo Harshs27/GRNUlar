@@ -31,10 +31,6 @@ parser.add_argument('--gen_DS', type=str,  default='no',#'no',
                     help='expt details in draft: DS1, DS2, DS3- simulates data using actual DS graphs')
 parser.add_argument('--POINTS_PER_CLASS', type=int, default=2000,# NOTE: try 2000
                     help='cells per class type')
-#parser.add_argument('--DS1_POINTS', type=int, default=300,# NOTE: 300
-#                    help='cells per class type for DS1 data')
-#parser.add_argument('--TOTAL_SIMULATIONS', type=int, default=1,
-#                    help='just run on some set of simulation')
 parser.add_argument('--SAMPLING_STATE', type=int, default=15, #1,
                     help='num of simulations')
 parser.add_argument('--NOISE_PARAMS', type=float, default=0.1, #1,
@@ -95,7 +91,6 @@ def main():
     print('Creating the data files and saving for expts')
     train_data, valid_data, test_data = gen_data.create_GRN_data(args)
     all_data = [train_data, valid_data, test_data]
-    #print('before: ', all_data[0][0])
     # saving the data
     FILEPATH = get_filepath(args)
     with open(FILEPATH, 'wb') as handle:
@@ -103,7 +98,6 @@ def main():
     
     with open(FILEPATH, 'rb') as handle:
         load_all_data = pickle.load(handle)
-    #print('after: ', load_all_data[0][0])
     print('Files saved')    
 
 if __name__=="__main__":

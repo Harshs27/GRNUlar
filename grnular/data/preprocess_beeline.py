@@ -1,3 +1,10 @@
+# We have not released the BEELINE data and ground truth network shared by the authors
+# due to privacy considerations. We are anyway making the code used for preprocessing
+# available. You will need to update the input folder and other basic I/O to get it 
+# to work. Needless, the preprocessing steps followed will be clear by following the
+# code. Please feel free to contact me (Harsh) via direct mail or raising a github 
+# issue.
+
 import numpy as np
 import pandas as pd
 print('pandas version: ', pd.__version__)

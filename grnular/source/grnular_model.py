@@ -16,11 +16,8 @@ class dnn_model(torch.nn.Module): # a simple DNN
 
     def getDNN(self):
         l1 = nn.Linear(self.T, self.H).type(self.dtype)
-#        l1 = nn.Linear(self.T, self.O).type(self.dtype)
 #        l2 = nn.Linear(self.H, self.H).type(self.dtype)
         l3 = nn.Linear(self.H, self.O).type(self.dtype)
-#        l3 = nn.Linear(self.H, self.O, bias=False).type(self.dtype)
-#        return nn.Sequential(l1, nn.Tanh(), #nn.ReLU(), #nn.Tanh(), 
         return nn.Sequential(l1, nn.ReLU(), #nn.Tanh(), 
 #                             l2, nn.ReLU(), #nn.Tanh(),
                              l3, #nn.Tanh(),
@@ -37,7 +34,6 @@ class glad_model(torch.nn.Module): # entrywise thresholding
             print('shifting to cuda')
             self.dtype = torch.cuda.FloatTensor
         self.L = L # number of unrolled iterations
-#        self.rho_init = torch.Tensor([rho_init]).type(self.dtype)
         self.theta_init_offset = nn.Parameter(torch.Tensor([theta_init_offset]).type(self.dtype))
         self.nF = nF # number of input features 
         self.H = H # hidden layer size
@@ -49,25 +45,15 @@ class glad_model(torch.nn.Module): # entrywise thresholding
     def rhoNN(self):# per iteration NN
         l1 = nn.Linear(self.nF, self.H).type(self.dtype)
         lH1 = nn.Linear(self.H, self.H).type(self.dtype)
-#        lH2 = nn.Linear(self.H, self.H).type(self.dtype)
-#        lH3 = nn.Linear(self.H, self.H).type(self.dtype)
-#        lH4 = nn.Linear(self.H, self.H).type(self.dtype)
         l2 = nn.Linear(self.H, 1).type(self.dtype)
         return nn.Sequential(l1, nn.Tanh(), 
                              lH1, nn.Tanh(),
-#                             lH2, nn.Tanh(), 
-#                             lH3, nn.Tanh(), 
-#                             lH4, nn.Tanh(), 
                               l2, nn.Sigmoid()).type(self.dtype)
 
     def lambdaNN(self):
         l1 = nn.Linear(2, self.H).type(self.dtype)
-#        lH1 = nn.Linear(self.H, self.H).type(self.dtype)
-#        lH2 = nn.Linear(self.H, self.H).type(self.dtype)
         l2 = nn.Linear(self.H, 1).type(self.dtype)
         return nn.Sequential(l1, nn.Tanh(), 
-#                             lH1, nn.Tanh(),
-#                             lH2, nn.Tanh(), 
                               l2, nn.Sigmoid()).type(self.dtype)        
 
 

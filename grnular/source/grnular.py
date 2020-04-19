@@ -90,56 +90,29 @@ def optDNN(model_details, X, Z, TF, lambda_k, args, PRINT, PREDICT):
     torch.set_grad_enabled(True)
     model_dnn, optimizer_dnn = model_details
     Xt = X[:, TF]
-#    print('T D: ', Z.shape, Xt.shape, args.Hd)
     # fit the regression using NN
-    # init the NN model
-    # NOTE: original model implemented
-#    model_dnn = dnn_model(T=Z.shape[0], O=Z.shape[1], H=args.Hd, USE_CUDA= (args.USE_CUDA_FLAG==1))
-#    optimizer_dnn = torch.optim.Adam(model_dnn.parameters(), lr=args.lrDNN, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
     criterion1 = nn.MSELoss()
     criterion2 = nn.MSELoss()
     #for p in range(args.DNN_EPOCHS):
     for p in range(args.P):
-        #print('inner unroll p = ', p)
         optimizer_dnn.zero_grad()
         Xp = model_dnn.DNN(Xt)
-#        print('Xt xp X ', Xt.shape, Xp.shape, X.shape)
         loss1 = criterion1(Xp, X)
         prod_W = get_prod_weights(model_dnn)
         # NOTE: try retain graph = true and remove the detach
         loss2 = lambda_k * criterion2(prod_W, Z)
-        #loss2 = criterion2(prod_W, Z)
-        #loss2 = criterion2(prod_W, Z)
         # total loss 
         loss_dnn = loss1 + loss2
         loss_dnn.backward() # calculate the gradients
         #loss_dnn.backward(retain_graph=True) # calculate the gradients
         optimizer_dnn.step() # update the weights
-        #if p%int(args.DNN_EPOCHS/10)==0 and PRINT:
         if PRINT and p%10==0:
             print('Dnn epoch = ', p, ' Loss DNN: ', loss_dnn)
     prod_W = get_prod_weights(model_dnn)#.detach()
     if PREDICT:
         torch.set_grad_enabled(False)
-#    prod_W.requires_grad = False
-#    del model_dnn
-#    print('prod W: ', prod_W)
     model_details = [model_dnn, optimizer_dnn]
     return prod_W, model_details #'model_details'
-
-def old_reconstruct_adj(Z):# Z = TxD
-    T, D = Z.shape
-    # reconstruct the adj matrix
-    theta_s = torch.zeros(D, D).type(Z.type())
-    theta_st = torch.zeros(D, D).type(Z.type())
-    theta_s[:T, :D] = Z
-    theta_st[:D, :T] = Z.t()
-    theta_s = theta_s + theta_st # Note: only symmetric
-    theta_s[:T, :T] = theta_s[:T, :T]/2.0
-#    print('CHECK symmetric: ', check_symmetric(theta_s.detach().cpu().numpy()))
-#    brr
-    return theta_s
-
 
 
 def reconstruct_adj(Z, TF):# Z = TxD
@@ -151,11 +124,7 @@ def reconstruct_adj(Z, TF):# Z = TxD
     theta_st[:D, TF] = Z.t()
     theta_s = theta_s + theta_st # Note: only symmetric
     theta_s = theta_s/2.0
-#    print('CHECK symmetric: ', check_symmetric(theta_s.detach().cpu().numpy()))
-#    brr
     return theta_s
-
-
 
     
 def check_symmetric(a, rtol=1e-05, atol=1e-08):
@@ -176,12 +145,8 @@ def grnular(X, theta_true, TF, models, args, criterion_graph, PRINT=True, PREDIC
         zero = zero.cuda()
         dtype = torch.cuda.FloatTensor
 
-    # good INIT
-    #model_dnn, optimizer_dnn = goodINIT(X, TF, args, PRINT=PRINT, PREDICT=PREDICT)
-    # for fast
+    # good INIT for fast
     model_details = goodINIT(X, TF, args, PRINT=PRINT, PREDICT=PREDICT)
-    #model_details = 'original'    
-
 
     lambda_k = model_glad.lambda_forward(zero + args.lambda_init, zero,  k=0)
     loss_glad = torch.Tensor([0]).type(dtype)
@@ -190,30 +155,14 @@ def grnular(X, theta_true, TF, models, args, criterion_graph, PRINT=True, PREDIC
     Z = torch.zeros(St.shape).type(dtype).detach() # T x D
     St.requires_grad = False
     theta_true = get_OT_submatrix(theta_true, TF)
-#    print('St check: ', St.shape, TF)
-#    print('CHECK grad: ', Z, St, theta_true, X)
     for k in range(args.L):
-#        print('k = ', k)
-        #theta_k = optDNN(X, Z, TF, lambda_k, args)# DxT
         if PRINT and k==args.L-1: # only print in last iteration of K
             do_PRINT = True
         theta_k, model_details = optDNN(model_details, X, Z.detach(), TF, lambda_k.detach(), args, do_PRINT, PREDICT)# DxT
-        #theta_k = optDNN([model_dnn, optimizer_dnn], X, Z.detach(), TF, lambda_k.detach(), args, do_PRINT, PREDICT)# DxT
-        #theta_k = optDNN([model_dnn, optimizer_dnn], X, Z, TF, lambda_k, args, do_PRINT, PREDICT)# DxT
         Z = model_glad.eta_forward(theta_k, St, k, Z)#.detach() 
         # update the lambda
         lambda_k = model_glad.lambda_forward(torch.Tensor([get_frobenius_norm(Z-theta_k, single=True)]).type(dtype), lambda_k, k)
-        # the Z values should be between [0, 1] for optimization
-#        print('Z before:', Z, Z[0])
-#        Z = torch.sigmoid(Z) # use abs or not?, torch.tanh(torch.abs(Z))
-#        print('Z after sigmoid', Z)
-        # if we use abs then sigmoid will only go to min 0.5, should use tanh?
-        #loss_glad += criterion_graph(torch.sigmoid(Z), theta_true)/args.L
         loss_glad += criterion_graph(nonL(Z), theta_true, PRINT=do_PRINT)/args.L
-#        loss_glad += criterion_graph(Z, theta_true)/args.L
-#        print('loss grnular: ', loss_glad)
-#        brr
     # get the theta_s 
-#    theta_s = reconstruct_adj(Z) # TxD -> DxD 
     theta_s = reconstruct_adj(nonL(Z), TF) # TxD -> DxD 
     return theta_s, loss_glad
