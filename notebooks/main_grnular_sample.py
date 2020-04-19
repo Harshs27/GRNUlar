@@ -87,10 +87,6 @@ parser.add_argument('--DATA_NAME', type=str,  default='DS1', #'DS1',
                     help='expt details in draft: DS1, DS2, DS3, CUSTOM')
 parser.add_argument('--POINTS_PER_CLASS', type=int, default=200,# NOTE: try 2000
                     help='cells per class type')
-#parser.add_argument('--DS1_POINTS', type=int, default=300,# NOTE: 300
-#                    help='cells per class type for DS1 data')
-#parser.add_argument('--TOTAL_SIMULATIONS', type=int, default=1,
-#                    help='just run on some set of simulation')
 parser.add_argument('--SAMPLING_STATE', type=int, default=15, #1,
                     help='num of simulations')
 parser.add_argument('--NOISE_PARAMS', type=float, default=0.1, #1,
@@ -359,27 +355,6 @@ def get_PSD_matrix(A, u=1):
     #print('CHEKKK: smallest eigen? = ', np.min(np.linalg.eigvals(target_precision_mat)))
     return target_precision_mat
 
-"""
-def postprocess_tf(prec, tf_names):
-#    print('Postprocesing for TF NAMES')
-    # remove all the edges whose at least one of the vertices is not in tf_names
-    # zeroing the diagonal to get adj matrix
-#    print('tf names: ', tf_names)
-    tf_names = ['G'+str(n) for n in tf_names]
-    np.fill_diagonal(prec, 0)
-    G_pred = nx.from_numpy_matrix(prec)
-    #mapping = {n: 'G'+str(n) for n in range(args.D)}
-    mapping = {n: 'G'+str(n) for n in range(prec.shape[-1])}
-    G_pred = nx.relabel_nodes(G_pred, mapping)
-    set_tf_names = tf_names
-    edges = copy.deepcopy(G_pred.edges)
-    for e in edges:
-        if not (set(e) & set(tf_names)):
-            # remove the edge
-            G_pred.remove_edge(*e[:2])
-    prec = get_PSD_matrix(nx.adj_matrix(G_pred).todense())
-    return np.array(prec)
-"""
 
 def get_tf_mask(tf_names, dim):
     mask = torch.zeros(dim, dim) + torch.eye(dim)
