@@ -1,5 +1,5 @@
 # GRNUlar
-Gene Regulatory Network reconstruction using Unrolled algorithms  
+Gene Regulatory Network reconstruction using Unrolled algorithms  (Paper link: TBD)
 
 Explore the notebook folder for a quick overview of the GRNUlar algorithm ran on jupyter notebook.  
 
