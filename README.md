@@ -1,6 +1,3 @@
-# GRNUlar
-Gene Regulatory Network reconstruction using Unrolled algorithms  
+# A sample implementation in JUPYTER NOTEBOOK
 
-Please explore the notebook folder for a quick overview of the GRNUlar algorithm on jupyter notebook implementation.  
-
-The `grnular' folder is a python module of the algorithm's implementation.  
+A basic working version of GRNUlar algorithm
