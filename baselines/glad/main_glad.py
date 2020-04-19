@@ -12,8 +12,6 @@ from baselines.glad.glad_model import glad_model
 from grnular.utils.metrics import report_metrics
 import sys, copy, pickle, time
 import sklearn
-print('The scikit-learn version is {}.'.format(sklearn.__version__))
-#np.set_printoptions(threshold=sys.maxsize)
 TRAIN=True
 
 parser = argparse.ArgumentParser(description='GLAD: sparse graph recovery')
@@ -75,10 +73,6 @@ parser.add_argument('--DATA_NAME', type=str,  default='DS1', #'DS1',
                     help='expt details in draft: DS1, DS2, DS3, CUSTOM')
 parser.add_argument('--POINTS_PER_CLASS', type=int, default=2000,# NOTE: try 2000
                     help='cells per class type')
-#parser.add_argument('--DS1_POINTS', type=int, default=300,# NOTE: 300
-#                    help='cells per class type for DS1 data')
-#parser.add_argument('--TOTAL_SIMULATIONS', type=int, default=1,
-#                    help='just run on some set of simulation')
 parser.add_argument('--SAMPLING_STATE', type=int, default=1, #1,
                     help='num of simulations')
 parser.add_argument('--NOISE_PARAMS', type=float, default=0.1, #1,
@@ -117,8 +111,6 @@ parser.add_argument('--dropout_percentile', type=float, default=82, #1,
 args = parser.parse_args()
 print(args)
 print('\n')
-#print(str(vars(args)))
-#args_str = str(vars(args))
 
 def get_args_str(dict1):
     args_str = ''
@@ -203,19 +195,14 @@ def glad_train_batch(train_data, valid_data=None):
 
     criterion_graph = get_glad_criterion()
     optimizer_glad = get_optimizers(model_glad)
-    #scheduler = MultiStepLR(optimizer, milestones=[1000], gamma=0.5)
-    #scheduler = MultiStepLR(optimizer, milestones=[10, 15, 20, 25, 100, 200], gamma=0.25)
     best_valid_shd, best_valid_Fb = np.inf, -1*np.inf
     typeS = 'mean'
-    print('Using ', typeS, ' scaling')
-#    rd = np.random.choice(len(train_data), size=len(train_data), replace=False) # get a rand number
+    rd = np.random.choice(len(train_data), size=len(train_data), replace=False) # get a rand number
 
-    rd = np.random.choice(len(train_data), size=5, replace=False) # get a rand number
+#    rd = np.random.choice(len(train_data), size=5, replace=False) # get a rand number
     print('selecting random points for training: ', rd, len(rd))
-#    for i, d in enumerate(train_data):
     for i, ri in enumerate(rd):
         X, y, theta, MR = train_data[ri]
-        #X, y, theta, MR = d
         X_centered = normalizing_data(X, typeS)
         print('#################### TRAIN data batch : ', i, ' total points = ', X.shape[0])
         batch_num = i
@@ -285,26 +272,13 @@ def glad_predict_batch(model, data, PRINT=True, PREDICT_TF=False, BEELINE=False)
         model_auxiliary = criterion_graph #[]
         res = [] # add res_tf
         typeS = 'mean'
-        print('Using ', typeS, ' scaling')
         for i, d in enumerate(data):
             X, y, theta_true, MR = d
             Xc = normalizing_data(X, typeS)
-            if BEELINE:
-                print('Data set : ', i, y)
-                if PREDICT_TF and args.USE_TF_NAMES=='yes':
-                    res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=True, pair_num=i, tf_names=MR))
-                else:
-                    res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=True, pair_num=i))
+            if args.USE_TF_NAMES=='yes' and PREDICT_TF:
+                res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=False, pair_num=i, tf_names=MR))
             else:
-                if args.USE_TF_NAMES=='yes' and PREDICT_TF:
-                    res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=False, pair_num=i, tf_names=MR))
-                else:
-                    res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=False, pair_num=i))
-        if BEELINE:
-            for i, r in enumerate(res):
-                r = ["%.3f" %x for x in r]
-                print(data[i][1], r)
-            return
+                res.append(glad_predict_single(model, model_auxiliary, theta_true, Xc, PRINT=False, pair_num=i))
 
         res_mean = np.mean(np.array(res).astype(np.float64), 0)
         res_std  = np.std(np.array(res).astype(np.float64), 0)
@@ -314,15 +288,11 @@ def glad_predict_batch(model, data, PRINT=True, PREDICT_TF=False, BEELINE=False)
         for i, _name in enumerate(['FDR', 'TPR', 'FPR', 'SHD', 'nnz_true', 'nnz_pred', 'precision', 'recall', 'Fb', 'aupr', 'auc']): # dictionary
             res_dict[_name]= [res_mean[i], res_std[i]]#mean std
         if PRINT:
-            #res_mean = np.array(res_mean).astype(np.float64)
-            #res_std = np.array(res_std).astype(np.float64)
             mean_std = [[rm, rs] for rm, rs in zip(res_mean, res_std)]
             flat_list = [item for ms in mean_std for item in ms]
             print('%s' % ', '.join(map(str, flat_list)))
-            #print(*sum(list(map(list, zip(res_mean, res_std))), []), sep=', ')
         #[SHD, Fb, accuracy]
         return float(res_dict['SHD'][0]), float(res_dict[args.MODEL_SELECT][0])
-        #return float(res_dict['SHD'][0]), float(res_dict['auc'][0])
 
 
 def get_PSD_matrix(A, u=1):
@@ -331,14 +301,12 @@ def get_PSD_matrix(A, u=1):
     smallest_eigval = smallest_eigval.real
     # making the min eigenvalue as 1
     target_precision_mat = A + np.eye(A.shape[-1])*(u - smallest_eigval)
-    #print('CHEKKK: smallest eigen? = ', np.min(np.linalg.eigvals(target_precision_mat)))
     return target_precision_mat
 
 def postprocess_tf(prec, tf_names):
 #    print('Postprocesing for TF NAMES')
     # remove all the edges whose at least one of the vertices is not in tf_names
     # zeroing the diagonal to get adj matrix
-#    print('tf names: ', tf_names)
     tf_names = ['G'+str(n) for n in tf_names]
     np.fill_diagonal(prec, 0)
     G_pred = nx.from_numpy_matrix(prec)
@@ -392,13 +360,9 @@ def mse_f_beta(masked_out, masked_target):
     mse_criterion = nn.MSELoss()
     loss_mse = mse_criterion(masked_out, masked_target)
     loss_fb = f_beta_loss(masked_out, masked_target)
-    #print('chh loss: mse ', loss_mse, ' fb', loss_fb)
     # Getting the ratio to scale the losses to roughly the same values.
     r = loss_fb.detach()/loss_mse.detach()
-#    if PRINT:
-#        print('Different loss: mse ', loss_mse, ' fb', loss_fb, ' Balancing r = fb/mse', r)
     return r*loss_mse + loss_fb
-#    return loss_mse + loss_fb
 
 def get_graph_from_theta(theta):
     # convert to numpy 
@@ -422,7 +386,6 @@ def glad_predict_single(model, model_auxiliary, theta, X_centered, PRINT=True, p
         dtype = torch.cuda.FloatTensor
         theta_true = theta_true.type(dtype)
     # predicting for the entire test data at once
-    #S = torch.matmul(X.t(), X)/X.shape[0]
     S = torch.matmul(X_centered.t(), X_centered)/X_centered.shape[0]
     # TF code for GLAD (include masking)
     mask_tf = []
@@ -431,8 +394,6 @@ def glad_predict_single(model, model_auxiliary, theta, X_centered, PRINT=True, p
         mask_tf = mask_tf.type(dtype)
     # stage I: get GLAD output
     theta_s, loss_glad = glad(S, theta_true, model_glad, args, criterion_graph, mask_tf)
-#    # stage I: get GLAD output
-#    theta_s, loss_glad = glad(S, theta_true, model_glad, args, criterion_graph)
     theta_s = torch.squeeze(theta_s)
     
     recovery_metrics = compare_theta(theta, theta_s)
@@ -442,27 +403,8 @@ def glad_predict_single(model, model_auxiliary, theta, X_centered, PRINT=True, p
         print('TEST: Recovery of true theta: ', *np.around(recovery_metrics, 3))
         print('TEST: glad loss', *np.around(itr_details, 3))
     
-    if args.SAVE_GRAPHS and pair_num==0 and False:
-        _num = 0
-        while _num < 2:
-            for t,n in [(theta_true, 'true'), (theta_s, 'pred')]:
-                fig = plt.figure(figsize=(15, 15))
-                #nx.draw_networkx(G, pos=nx.spring_layout(G), with_labels = True)
-                G = get_graph_from_theta(t)
-                nx.draw_networkx(G, with_labels = True)
-                plt.savefig(n+'_'+args.DATA_NAME+'.pdf', bbox_inches = 'tight')
-            _num += 1
-
-
-#    # POSTPROCESSING code for TF
-#    if args.USE_TF_NAMES=='yes' and len(tf_names) != 0:
-#        prec_tf = postprocess_tf(theta_s.detach().cpu().numpy(), tf_names)
-#        recovery_metrics = report_metrics(np.array(theta), prec_tf)
-
     res = list(recovery_metrics)# + itr_details
     return res 
-    #return list(recovery_metrics) + itr_details # concatenate results
-
 
 
 def normalizing_data(X, typeS='log'):

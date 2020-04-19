@@ -5,8 +5,6 @@
 #PBS -l walltime=12:00:00
 #PBS -v D pts C NP Decays E Pe Gl dataT NT Ktr Kva Kte MS SS Sp L pcrln pcrlx pcrhn pcrhx kmin kmax tf rMR TFp H initT techN dropS dropP dataM dataN Hd lrDNN DNNe lrG P B
 
-
-
 echo "Running grnular experiments"
 
 cd data/alienn/GRNUlar/

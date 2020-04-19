@@ -10,8 +10,6 @@ from arboreto.algo import grnboost2
 from arboreto.utils import load_tf_names
 import pandas as pd
 import sklearn 
-#print('The scikit-learn version is {}.'.format(sklearn.__version__))
-#np.set_printoptions(threshold=sys.maxsize)
 TRAIN=True
 
 parser = argparse.ArgumentParser(description='Classification of different cell types as well as recovering the gene regulatory network of RNA seq data: using SERGIO simulator for training')
@@ -41,10 +39,6 @@ parser.add_argument('--DATA_NAME', type=str,  default='CUSTOM', #'DS1',
                     help='expt details in draft: DS1, DS2, DS3, CUSTOM')
 parser.add_argument('--POINTS_PER_CLASS', type=int, default=2000,# NOTE: try 2000
                     help='cells per class type')
-#parser.add_argument('--DS1_POINTS', type=int, default=300,# NOTE: 300
-#                    help='cells per class type for DS1 data')
-#parser.add_argument('--TOTAL_SIMULATIONS', type=int, default=1,
-#                    help='just run on some set of simulation')
 parser.add_argument('--SAMPLING_STATE', type=int, default=1, #1,
                     help='num of simulations')
 parser.add_argument('--NOISE_PARAMS', type=float, default=0.1, #1,
@@ -134,9 +128,6 @@ def fit_grnboost2(data, PREDICT_TF=False, BEELINE=False):
     mean_std = [[rm, rs] for rm, rs in zip(res_mean, res_std)]
     flat_list = [item for ms in mean_std for item in ms]
     print('%s' % ', '.join(map(str, flat_list))) 
-#    res_mean = np.array(res_mean).astype(np.float)
-#    res_std = np.array(res_std).astype(np.float)
-#    print(*sum(list(map(list, zip(res_mean, res_std))), []), sep=', ')
     return
 
 

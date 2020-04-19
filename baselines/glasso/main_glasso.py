@@ -9,8 +9,6 @@ import sys, copy, pickle
 from sklearn.covariance import GraphicalLassoCV
 from sklearn.covariance import GraphicalLasso
 import sklearn
-print('The scikit-learn version is {}.'.format(sklearn.__version__))
-#np.set_printoptions(threshold=sys.maxsize)
 TRAIN=True
 
 parser = argparse.ArgumentParser(description='Classification of different cell types as well as recovering the gene regulatory network of RNA seq data: using SERGIO simulator for training')
@@ -43,10 +41,6 @@ parser.add_argument('--DATA_NAME', type=str,  default='CUSTOM', #'DS1',
                     help='expt details in draft: DS1, DS2, DS3, CUSTOM')
 parser.add_argument('--POINTS_PER_CLASS', type=int, default=2000,# NOTE: try 2000
                     help='cells per class type')
-#parser.add_argument('--DS1_POINTS', type=int, default=300,# NOTE: 300
-#                    help='cells per class type for DS1 data')
-#parser.add_argument('--TOTAL_SIMULATIONS', type=int, default=1,
-#                    help='just run on some set of simulation')
 parser.add_argument('--SAMPLING_STATE', type=int, default=1, #1,
                     help='num of simulations')
 parser.add_argument('--NOISE_PARAMS', type=float, default=0.1, #1,
@@ -165,7 +159,6 @@ def postprocess_tf(prec, tf_names):
 #    print('Postprocesing for TF NAMES')
     # remove all the edges whose at least one of the vertices is not in tf_names
     # zeroing the diagonal to get adj matrix
-#    print('tf names: ', tf_names)
     tf_names = ['G'+str(n) for n in tf_names]
     np.fill_diagonal(prec, 0)
     G_pred = nx.from_numpy_matrix(prec)
@@ -189,8 +182,6 @@ def helper_graphical_lasso(X, theta_true, tf_names=[]):
     else:
         model = GraphicalLasso(alpha=args.alpha_l1, mode=args.mode, tol=1e-7, enet_tol=1e-6, 
                                 max_iter=100, verbose=False, assume_centered=False)
-    #model = GraphicalLasso(alpha=args.alpha, mode='lars', tol=1e-7, enet_tol=1e-6, 
-    #           max_iter=args.100, verbose=True, assume_centered=False)
     model.fit(X)
 #    cov_ = model.covariance_
     prec_ = model.precision_

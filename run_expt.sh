@@ -86,25 +86,17 @@ do
 #                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, SS=${SS}, Sp=${Sp}, rMR=${rMR}, TFp=${TFp}" run_sim_expt3_create_data.pbs &
 
 #                            echo "Running GLAD on swarm-gpu"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, B=${B}, lrG=${lrG}" run_sim_expt3_glad.pbs &
+#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, B=${B}, lrG=${lrG}" run_expt_glad.pbs &
 
                             echo "Running GRNUlar on gpu"
                             qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, Hd=${Hd}, lrDNN=${lrDNN}, DNNe=${DNNe}, lrG=${lrG}, P=${P}, B=${B}" run_expt_grnular.pbs &
 
-#                            echo "Running GRNUlar on hive-gpu"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, Hd=${Hd}, lrDNN=${lrDNN}, DNNe=${DNNe}, lrG=${lrG}, P=${P}" run_sim_expt3_grnular_hive.pbs &
-
-#                            echo "Running GRNUlar on swarm"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}, Hd=${Hd}, lrDNN=${lrDNN}, DNNe=${DNNe}, lrG=${lrG}, P=${P}" run_sim_expt3_grnular_swarm.pbs &
-
-#                            echo "Running GLAD on swarm"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, E=$E, Pe=${Pe}, Gl=${GL}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, MS=${MS}, SS=${SS}, Sp=${Sp}, L=${L}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, H=${H}, initT=${initT}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}" run_sim_expt3_glad_swarm.pbs &
 
 #                            echo "Running GLASSO on swarm"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, SS=${SS}, Sp=${Sp}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, alpha=${alpha}, mode=${mode}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}" run_sim_expt3_glasso.pbs &
+#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, SS=${SS}, Sp=${Sp}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, alpha=${alpha}, mode=${mode}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}" run_sim_expt_glasso.pbs &
 
 #                            echo "Running GRNBoost2 on swarm"
-#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, SS=${SS}, Sp=${Sp}, tf=${tf}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}" run_sim_expt3_grnboost2.pbs &
+#                            qsub -v "D=$D, pts=${pts}, C=$C, NP=${NP}, Decays=${Decays}, dataT=${dataT}, NT=${NT}, Ktr=${Ktr}, Kva=${Kva}, Kte=${Kte}, SS=${SS}, Sp=${Sp}, tf=${tf}, pcrln=${pcrln}, pcrlx=${pcrlx}, pcrhn=${pcrhn}, pcrhx=${pcrhx}, kmin=${kmin}, kmax=${kmax}, tf=${tf}, rMR=${rMR}, TFp=${TFp}, techN=${techN}, dropS=${dropS}, dropP=${dropP}, dataM=${dataM}, dataN=${dataN}" run_expt_grnboost2.pbs &
                             done
                             done
                         done
