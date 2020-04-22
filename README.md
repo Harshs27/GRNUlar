@@ -9,5 +9,5 @@ Please do not hesitate to connect with me via email or raise an issue on Github 
 
 # GRNUlar Architecture  
 Using the neural network in a multi-task learning framework which act asnon-linear regression functions between TFs and other genes. We start with a fullyconnected NN indicating all genes are dependent on all the input TFs (dotted blacklines).  Assume that in the process of discovering the underlying sparse GRN ouralgorithm zeroes out all the edge weights except the blue ones. Now, if there is apath from an input TF to an output gene, then we conclude that the output gene isdependent on the corresponding input TF.  
-(https://github.com/Harshs27/GRNUlar/blob/master/architecture_images/grnular_architecture1.png)
+![architectureNN](https://github.com/Harshs27/GRNUlar/blob/master/architecture_images/grnular_architecture1.png)
 
